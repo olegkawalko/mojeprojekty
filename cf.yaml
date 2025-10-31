@@ -2,6 +2,7 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: >
   Infrastrukturę sieciową do testów ruchu sieciowego
   z ALB, NLB, jedną NAT Gateway, prywatnymi/publicznymi subnetami i EC2 (Ubuntu user data).
+
 Parameters:
   VpcCIDR:
     Type: String
@@ -9,7 +10,7 @@ Parameters:
 
 Resources:
 
-  # VPC
+  # --- VPC ---
   MyVPC:
     Type: AWS::EC2::VPC
     Properties:
@@ -58,7 +59,7 @@ Resources:
           Value: PublicSubnet2
 
   # --- Private subnets ---
-  PrivateSubnet1:
+  PrivateSubnet2:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref MyVPC
@@ -67,7 +68,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: PrivateSubnet1
+          Value: PrivateSubnet2
 
   PrivateSubnet3:
     Type: AWS::EC2::Subnet
@@ -126,13 +127,13 @@ Resources:
           Value: NatGateway
 
   # --- Private Route Tables ---
-  PrivateRouteTable1:
+  PrivateRouteTable2:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref MyVPC
       Tags:
         - Key: Name
-          Value: PrivateRouteTable1
+          Value: PrivateRouteTable2
 
   PrivateRouteTable3:
     Type: AWS::EC2::RouteTable
@@ -143,19 +144,19 @@ Resources:
           Value: PrivateRouteTable3
 
   # --- Routes for private subnets ---
-  PrivateRoute1:
+  PrivateRoute2:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref PrivateRouteTable1
+      RouteTableId: !Ref PrivateRouteTable2
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref NatGateway
 
   # --- Associate private subnets ---
-  PrivateSubnet1RouteTableAssociation:
+  PrivateSubnet2RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      SubnetId: !Ref PrivateSubnet1
-      RouteTableId: !Ref PrivateRouteTable1
+      SubnetId: !Ref PrivateSubnet2
+      RouteTableId: !Ref PrivateRouteTable2
 
   PrivateSubnet3RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -236,7 +237,7 @@ Resources:
     Properties:
       InstanceType: t3.micro
       ImageId: ami-0fc5d935ebf8bc3bc
-      SubnetId: !Ref PrivateSubnet1
+      SubnetId: !Ref PrivateSubnet2
       SecurityGroupIds:
         - !Ref PrivateSG
       KeyName: klucz
@@ -293,7 +294,7 @@ Resources:
     Properties:
       Name: test-nlb
       Subnets:
-        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
         - !Ref PrivateSubnet3
       Scheme: internal
       Type: network
