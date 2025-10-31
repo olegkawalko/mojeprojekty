@@ -215,12 +215,12 @@ Resources:
           systemctl enable apache2
           echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html
 
-  EC2Public1:
+  EC2Public2:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t3.micro
       ImageId: ami-0fc5d935ebf8bc3bc  # Ubuntu 22.04 LTS (region-dependent!)
-      SubnetId: !Ref PublicSubnet1
+      SubnetId: !Ref PublicSubnet2
       SecurityGroupIds:
         - !Ref PublicSG
       KeyName: klucz
